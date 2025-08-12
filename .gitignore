@@ -1,0 +1,42 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Build output
+target/
+out/
+
+# Log files
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Maven wrapper
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+
+# Maven build backups
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+
+# Spring Boot artifacts (optional)
+*.jar
+*.war
+
+# Environment/config files
+.env
+
+# Ignore profile-specific YAML files
+application-*.yml
+!application.yml
+
+# IntelliJ AI plugins or project-specific metadata
+.idea/.gitignore
+.idea/.name
