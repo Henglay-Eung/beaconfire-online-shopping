@@ -1,4 +1,4 @@
-package org.example.onlineshopping.controller;
+package org.example.onlineshopping.controller.user_controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.onlineshopping.domain.login.request.LoginRequest;
@@ -24,7 +24,7 @@ public class LoginController {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) throws Exception {
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -34,10 +34,10 @@ public class LoginController {
 
         AuthUserDetail authUserDetail = (AuthUserDetail) authentication.getPrincipal();
         String token = jwtProvider.createToken(authUserDetail);
-        return ResponseEntity.ok(LoginResponse.builder()
+        System.out.println(token);
+        return new ResponseEntity<>(LoginResponse.builder()
                 .message("Logged in successfully.")
                 .token(token)
-                .build());
+                .build(), HttpStatus.CREATED);
     }
-
 }

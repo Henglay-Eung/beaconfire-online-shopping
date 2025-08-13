@@ -19,24 +19,24 @@ import java.util.List;
 public class AdminProductController {
     private final ProductService productService;
 
-    @GetMapping("/all")
+    @GetMapping()
     public ResponseEntity<List<ProductResponse>> getAllProductsForAdmin() {
         List<ProductResponse> products = productService.getAllProducts();
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
-    @GetMapping("/all/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductByIdForAdmin(@PathVariable int id) {
         ProductResponse products = productService.getProductById(id);
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
-    @PatchMapping("/all/{id}")
+    @PatchMapping("/{id}")
     public void updateProductByIdForAdmin(@PathVariable int id, @RequestBody ProductRequest productRequest) {
         productService.updateProductByIdForAdmin(id, productRequest);
     }
 
-    @PostMapping("/all/")
+    @PostMapping
     public void addProductForAdmin(@RequestBody ProductRequest productRequest) {
         productService.addProductForAdmin(productRequest);
     }

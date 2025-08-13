@@ -1,6 +1,7 @@
 package org.example.onlineshopping.service;
 
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Or;
 import org.example.onlineshopping.domain.login.request.OrderRequest;
 import org.example.onlineshopping.entity.Order;
 import org.example.onlineshopping.entity.OrderItem;
@@ -10,6 +11,7 @@ import org.example.onlineshopping.exception.NotEnoughInventoryException;
 import org.example.onlineshopping.repository.OrderRepository;
 import org.example.onlineshopping.repository.ProductRepository;
 import org.example.onlineshopping.repository.UserRepository;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -19,13 +21,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class OrderService {
-    private OrderRepository orderRepository;
-    private ProductRepository productRepository;
-    private UserRepository userRepository;
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     public void placeAnOrder(OrderRequest orderRequest, String username) {
         Order order = new Order();
@@ -37,13 +41,13 @@ public class OrderService {
         order.setOrderStatus("Processing");
 
         List<OrderItem> orderItems = orderRequest.getOrderItems().stream().map(orderItem -> {
-            Optional<Product> productOptional = productRepository.getProductById(orderItem.getItemId());
+            Optional<Product> productOptional = productRepository.getProductById(orderItem.getProductId());
             if (!productOptional.isPresent()) {
-                throw new RuntimeException(String.format("Item id = %d not found", orderItem.getItemId()));
+                throw new RuntimeException(String.format("Item id = %d not found", orderItem.getProductId()));
             }
             Product product = productOptional.get();
             if (product.getQuantity() < orderItem.getQuantity()) {
-                throw new NotEnoughInventoryException(String.format("Item id = %d not enough quantity", orderItem.getItemId()));
+                throw new NotEnoughInventoryException(String.format("Item id = %d not enough quantity", orderItem.getProductId()));
             }
             return OrderItem.builder()
                     .purchasedPrice(product.getRetailPrice())
@@ -90,7 +94,7 @@ public class OrderService {
     }
 
     public Order getOrderByIdForAdmin(int id) {
-        Optional<Order> orderOptional = orderRepository.getAnOrderByIdForAdmin(id);
+        Optional<Order> orderOptional = orderRepository.getAnOrderById(id);
         if (!orderOptional.isPresent()) {
             throw new RuntimeException("Order not found");
         }
@@ -98,7 +102,7 @@ public class OrderService {
     }
 
     public void cancelAnOrderForAdmin(int id) {
-        Optional<Order> orderOptional = orderRepository.getAnOrderByIdForAdmin(id);
+        Optional<Order> orderOptional = orderRepository.getAnOrderById(id);
         if (!orderOptional.isPresent()) {
             throw new RuntimeException(String.format("Order id = %d not found", id));
         }
@@ -116,7 +120,7 @@ public class OrderService {
     }
 
     public void completeAnOrderForAdmin(int id) {
-        Optional<Order> orderOptional = orderRepository.getAnOrderByIdForAdmin(id);
+        Optional<Order> orderOptional = orderRepository.getAnOrderById(id);
         if (!orderOptional.isPresent()) {
             throw new RuntimeException(String.format("Order id = %d not found", id));
         }
@@ -126,5 +130,23 @@ public class OrderService {
         }
         order.setOrderStatus("Completed");
         orderRepository.updateAnOrder(order);
+    }
+
+    public List<Order> getAllOrdersForUser(String username) {
+        Optional<User> user = userRepository.loadUserByUsernameWithOrderList(username);
+        if (!user.isPresent()) {
+            throw new RuntimeException(String.format("User not found"));
+        }
+        return user.get().getOrderList();
+
+    }
+    public Order getOrderByIdForUser(int id, String username) {
+        Optional<Order> order  = getAllOrdersForUser(username).stream().filter(o -> o.getOrderId() == id)
+                .findFirst();
+        if (!order.isPresent()) {
+            throw new RuntimeException(String.format("Order not found"));
+        }
+        return order.get();
+
     }
 }

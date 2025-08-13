@@ -1,13 +1,15 @@
 package org.example.onlineshopping.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,8 +29,10 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "fk_user_id")
+    @JsonIgnore
     private User user;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderItem> orderItemList;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<OrderItem> orderItemList = new ArrayList<>();
 }

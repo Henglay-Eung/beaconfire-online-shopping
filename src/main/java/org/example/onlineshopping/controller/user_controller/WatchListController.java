@@ -1,4 +1,4 @@
-package org.example.onlineshopping.controller;
+package org.example.onlineshopping.controller.user_controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.onlineshopping.entity.Product;
@@ -17,24 +17,27 @@ import java.util.Optional;
 @RequestMapping("/watchlist")
 @RequiredArgsConstructor
 public class WatchListController {
-    private WatchListService watchListService;
-    private UserService userService;
+    private final WatchListService watchListService;
+    private final UserService userService;
 
     @PostMapping("/product/{id}")
     public void AddProductToWatchlist(@PathVariable int id, Principal principal) {
-        String username = principal.getName();
+        //String username = principal.getName();
+        String username = "user";
         watchListService.addNewProductToWatchList(username, id);
     }
 
     @DeleteMapping("/product/{id}")
     public void removeProductFromWatchlist(@PathVariable int id, Principal principal) {
-        String username = principal.getName();
+        //String username = principal.getName();
+        String username = "user";
         watchListService.removeProductFromWatchList(username, id);
     }
 
     @GetMapping("/products/all")
     public ResponseEntity<List<Product>> GetAllProductsFromWatchlist(Principal principal) {
-        String username = principal.getName();
+//        String username = principal.getName();
+        String username = "user";
         List<Product> products = watchListService.getAllProductsFromWatchList(username);
         return new ResponseEntity<>(products, HttpStatus.OK);
     }

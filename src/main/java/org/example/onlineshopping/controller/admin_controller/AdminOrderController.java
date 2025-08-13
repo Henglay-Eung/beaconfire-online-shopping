@@ -34,7 +34,7 @@ public class AdminOrderController {
         orderService.cancelAnOrderForAdmin(id);
         return new ResponseEntity<>("Order canceled successfully", HttpStatus.ACCEPTED);
     }
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/complete")
     public ResponseEntity<String> completeAnOrderForAdmin(@PathVariable int id) {
         orderService.completeAnOrderForAdmin(id);
         return new ResponseEntity<>("Order completed successfully", HttpStatus.ACCEPTED);

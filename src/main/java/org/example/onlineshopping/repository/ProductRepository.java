@@ -20,7 +20,7 @@ public class ProductRepository {
 
     public List<Product> getAllProducts() {
         Session session = sessionFactory.getCurrentSession();
-        List<Product> products = session.createQuery("from Product WHERE Product.quantity > 0").getResultList();
+        List<Product> products = session.createQuery("from Product p WHERE p.quantity > 0").getResultList();
         return products;
     }
 

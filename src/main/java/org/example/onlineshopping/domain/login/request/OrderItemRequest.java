@@ -1,16 +1,19 @@
 package org.example.onlineshopping.domain.login.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Getter
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderItemRequest {
-    @NotNull
-    private final int itemId;
     @Min(1)
-    private final int quantity;
+    private int productId;
+    @Min(1)
+    private int quantity;
 }

@@ -3,7 +3,6 @@ package org.example.onlineshopping.repository;
 import lombok.RequiredArgsConstructor;
 import org.example.onlineshopping.entity.Order;
 import org.example.onlineshopping.entity.OrderItem;
-import org.example.onlineshopping.entity.Product;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -27,31 +26,31 @@ public class OrderRepository {
         session.update(order);
     }
 
-    public Optional<Order> getAnOrderByIdAndUserId(int id, int userId) {
+    public Optional<Order> getAnOrderByIdAndUserId(int id, Long userId) {
         Session session = sessionFactory.getCurrentSession();
-        Query<Order> query = session.createQuery("from Order WHERE Order.id = :id AND Order.user.id = :userId");
+        Query<Order> query = session.createQuery("from Order o WHERE o.id = :id AND o.user.id = :userId");
         query.setParameter("id", id);
         query.setParameter("userId", userId);
         return Optional.ofNullable(query.getSingleResult());
     }
 
-    public List<Integer> getTopNMostRecentOrderListByUserId(int userId, int topN) {
+    public List<Integer> getTopNMostRecentOrderListByUserId(Long userId) {
         Session session = sessionFactory.getCurrentSession();
-        Query<Integer> query = session.createQuery("from Order o WHERE o.user.id = :userId AND o.orderStatus != :status ORDER BY o.datePlaced DESC");
+        Query<Integer> query = session.createQuery("select o.orderId from Order o WHERE o.user.id = :userId AND o.orderStatus != :status ORDER BY o.datePlaced DESC");
         query.setParameter("userId", userId);
         query.setParameter("status", "Canceled");
-        query.setMaxResults(topN);
         return query.list();
     }
 
-    public List<OrderItem> getOrderItemsByOrderId(List<Integer> orderIdList) {
+    public List<OrderItem> getOrderItemsByOrderId(List<Integer> orderIdList, int topN) {
         Session session = sessionFactory.getCurrentSession();
-        Query<OrderItem> query = session.createQuery("from OrderItem oi WHERE oi.id in :orderIdList");
+        Query<OrderItem> query = session.createQuery("from OrderItem oi WHERE oi.order.orderId in :orderIdList");
         query.setParameter("orderIdList", orderIdList);
+        query.setMaxResults(topN);
         return query.getResultList();
     }
 
-    public List<Integer> getOrderListByUserId(int userId) {
+    public List<Integer> getOrderListByUserId(Long userId) {
         Session session = sessionFactory.getCurrentSession();
         Query<Integer> query = session.createQuery("select o.id from Order o WHERE o.user.id = :userId AND o.orderStatus != :status");
         query.setParameter("userId", userId);
@@ -73,7 +72,7 @@ public class OrderRepository {
         return query.getResultList();
     }
 
-    public Optional<Order> getAnOrderByIdForAdmin(int id) {
+    public Optional<Order> getAnOrderById(int id) {
         Session session = sessionFactory.getCurrentSession();
         Query<Order> query = session.createQuery("from Order o where o.id = :id");
         query.setParameter("id", id);
@@ -102,6 +101,13 @@ public class OrderRepository {
             query.setMaxResults(topN);
         }
 
+        return query.getResultList();
+    }
+
+    public List<Order> getAllOrdersByOrderIds(List<Integer> orderIds) {
+        Session session = sessionFactory.getCurrentSession();
+        Query<Order> query = session.createQuery("from Order o where o.orderId in :orderIds");
+        query.setParameter("orderIds", orderIds);
         return query.getResultList();
     }
 }

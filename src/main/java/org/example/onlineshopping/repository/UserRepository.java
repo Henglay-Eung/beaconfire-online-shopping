@@ -2,12 +2,15 @@ package org.example.onlineshopping.repository;
 
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.onlineshopping.entity.Permission;
 import org.example.onlineshopping.entity.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,14 +19,16 @@ public class UserRepository {
     private final SessionFactory sessionFactory;
     public Optional<User> loadUserByUsername(String username) {
         Session session = sessionFactory.getCurrentSession();
-        User user =  session.get(User.class, username);
+        Query<User> query = session.createQuery("from User u where u.username = :username");
+        query.setParameter("username", username);
+        User user = query.getSingleResult();
         return Optional.ofNullable(user);
     }
 
-    public void registerUser(String username, String email, String password) {
+    public void registerUser(String username, String email, String password, List<Permission> permissionList) {
         Session session = sessionFactory.getCurrentSession();
 
-        User user = User.builder().username(username).email(email).password(password).build();
+        User user = User.builder().username(username).email(email).password(password).permissions(permissionList).build();
         session.persist(user);
     }
 
@@ -34,10 +39,27 @@ public class UserRepository {
 
     public boolean isUsernameOrEmailAvailable(String username, String email) {
         Session session = sessionFactory.getCurrentSession();
-        Query<Integer> query = session.createQuery("SELECT count(u) FROM User u WHERE User.username = :username OR User.email = :email");
+        Query<Long> query = session.createQuery("SELECT count(u) FROM User u WHERE u.username = :username OR u.email = :email");
         query.setParameter("username", username);
         query.setParameter("email", email);
-        int count = query.getSingleResult();
+        long count = query.getSingleResult();
         return count == 0;
     }
+
+    public Optional<User> loadUserByUsernameWithWatchList(String username) {
+        Session session = sessionFactory.getCurrentSession();
+        Query<User> query = session.createQuery("from User u LEFT JOIN fetch u.watchlist where u.username = :username");
+        query.setParameter("username", username);
+        User user = query.getSingleResult();
+        return Optional.ofNullable(user);
+    }
+
+    public Optional<User> loadUserByUsernameWithOrderList(String username) {
+        Session session = sessionFactory.getCurrentSession();
+        Query<User> query = session.createQuery("from User u LEFT JOIN fetch u.orderList where u.username = :username");
+        query.setParameter("username", username);
+        User user = query.getSingleResult();
+        return Optional.ofNullable(user);
+    }
+
 }

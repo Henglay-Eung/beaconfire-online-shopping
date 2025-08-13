@@ -7,11 +7,13 @@ import org.example.onlineshopping.repository.ProductRepository;
 import org.example.onlineshopping.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class WatchListService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
@@ -49,11 +51,11 @@ public class WatchListService {
     }
 
     public List<Product> getAllProductsFromWatchList(String username) {
-        Optional<User> userOptional = userRepository.loadUserByUsername(username);
+        Optional<User> userOptional = userRepository.loadUserByUsernameWithWatchList(username);
         if (!userOptional.isPresent()) {
             throw new RuntimeException("User not found");
         }
 
-        return productRepository.getAllProducts();
+        return userOptional.get().getWatchlist();
     }
 }

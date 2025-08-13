@@ -1,4 +1,4 @@
-package org.example.onlineshopping.controller;
+package org.example.onlineshopping.controller.user_controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.onlineshopping.domain.login.response.ProductResponse;
@@ -31,13 +31,15 @@ public class ProductController {
 
     @GetMapping("/recent/{top-n}")
     public ResponseEntity<List<OrderItem>> getMostRecentlyPurchasedProducts(@PathVariable(name = "top-n") int topN, Principal principal) {
-        List<OrderItem> orderItems = productService.getMostRecentlyPurchasedProducts(topN, principal.getName());
+        String username = "user";
+        List<OrderItem> orderItems = productService.getMostRecentlyPurchasedProducts(topN, username);
         return new ResponseEntity<>(orderItems, HttpStatus.OK);
     }
 
     @GetMapping("/frequent/{top-n}")
     public ResponseEntity<List<OrderItem>> getMostFrequentlyPurchasedProducts(@PathVariable(name = "top-n") int topN, Principal principal) {
-        List<OrderItem> orderItems = productService.getMostFrequentlyPurchasedProducts(topN, principal.getName());
+        String username = "user";
+        List<OrderItem> orderItems = productService.getMostFrequentlyPurchasedProducts(topN, username);
         return new ResponseEntity<>(orderItems, HttpStatus.OK);
     }
 }

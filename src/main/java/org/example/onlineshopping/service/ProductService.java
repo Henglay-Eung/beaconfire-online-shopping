@@ -12,12 +12,15 @@ import org.example.onlineshopping.repository.ProductRepository;
 import org.example.onlineshopping.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProductService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
@@ -45,9 +48,8 @@ public class ProductService {
         }
         User user = userOptional.get();
 
-        List<Integer> orderIdList = orderRepository.getTopNMostRecentOrderListByUserId(user.getUserId(), topN);
-
-        return orderRepository.getOrderItemsByOrderId(orderIdList);
+        List<Integer> orderIdList = orderRepository.getTopNMostRecentOrderListByUserId(user.getUserId());
+        return orderRepository.getOrderItemsByOrderId(orderIdList, topN);
     }
 
     public List<OrderItem> getMostFrequentlyPurchasedProducts(int topN, String username) {
@@ -77,8 +79,8 @@ public class ProductService {
         if (productRequest.getRetailPrice() != null) {
             product.setRetailPrice(productRequest.getRetailPrice());
         }
-        if (productRequest.getWholeSalePrice() != null) {
-            product.setWholeSalePrice(productRequest.getWholeSalePrice());
+        if (productRequest.getWholesalePrice() != null) {
+            product.setWholeSalePrice(productRequest.getWholesalePrice());
         }
         if (productRequest.getName() != null) {
             product.setName(productRequest.getName());
@@ -92,7 +94,7 @@ public class ProductService {
                 .name(productRequest.getName())
                 .description(productRequest.getDescription())
                 .retailPrice(productRequest.getRetailPrice())
-                .wholeSalePrice(productRequest.getWholeSalePrice())
+                .wholeSalePrice(productRequest.getWholesalePrice())
                 .quantity(productRequest.getQuantity())
                 .build();
 

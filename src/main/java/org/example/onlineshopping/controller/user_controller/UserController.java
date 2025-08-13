@@ -1,4 +1,4 @@
-package org.example.onlineshopping.controller;
+package org.example.onlineshopping.controller.user_controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.onlineshopping.domain.login.request.UserRequest;
@@ -12,14 +12,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
-@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    @PostMapping
-    public ResponseEntity<String> register(@RequestBody UserRequest userRequest) throws Exception {
-        userService.registerUser(userRequest.getUsername(), userRequest.getEmail(), userRequest.getPassword());
+    @PostMapping("/signup")
+    public ResponseEntity<String> register(@Valid @RequestBody UserRequest userRequest) {
+        userService.registerUser(userRequest);
         return new ResponseEntity<>("User has been successfully created.", HttpStatus.CREATED);
     }
 }

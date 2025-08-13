@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class ProductRequest {
     private final String name;
     private final String description;
-    private final Double wholeSalePrice;
+    private final Double wholesalePrice;
     private final Double retailPrice;
     private final Integer quantity;
 }

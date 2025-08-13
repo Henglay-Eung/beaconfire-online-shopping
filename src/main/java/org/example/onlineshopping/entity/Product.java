@@ -1,5 +1,6 @@
 package org.example.onlineshopping.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -31,6 +32,7 @@ public class Product {
     @Column(name = "wholesale_price")
     private double wholeSalePrice;
 
-    @ManyToMany(mappedBy = "productWatchlist")
-    private List<User> productWatchList = new ArrayList<>();
+    @ManyToMany(mappedBy = "watchlist", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<User> users = new ArrayList<>();
 }

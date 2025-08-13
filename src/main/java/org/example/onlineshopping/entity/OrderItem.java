@@ -1,5 +1,6 @@
 package org.example.onlineshopping.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,11 +26,13 @@ public class OrderItem {
     @Column(name = "wholesale_price")
     private double wholesalePrice;
 
-    @ManyToOne
-    @JoinColumn(name = "fk_order_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "fk_order_item_id")
     private Order order;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_product_id")
+    @JsonIgnore
     private Product product;
 }

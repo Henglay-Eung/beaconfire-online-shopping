@@ -17,7 +17,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private int userId;
+    private Long userId;
 
     private String username;
 
@@ -25,10 +25,10 @@ public class User {
 
     private String password;
 
-//    @Column
-//    @OneToMany
-//    @JoinColumn(name = "fk_auth_id")
-//    private List<String> authorities;
+    @Column
+    @OneToMany(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "fk_auth_id")
+    private List<Permission> permissions;
 
     @ManyToMany
     @JoinTable(
@@ -36,12 +36,15 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    private List<Product> productWatchlist = new ArrayList<>();
+    private List<Product> watchlist = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orderList = new ArrayList<>();
 
     public void addProductToWatchList(Product product) {
-        productWatchlist.add(product);
+        watchlist.add(product);
     }
     public void removeProductFromWatchList(Product product) {
-        productWatchlist.remove(product);
+        watchlist.remove(product);
     }
 }

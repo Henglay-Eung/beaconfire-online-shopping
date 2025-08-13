@@ -16,10 +16,10 @@ public class JwtProvider {
 
     public String createToken(UserDetails userDetails) {
         Claims claims = Jwts.claims().setSubject(userDetails.getUsername());
-        claims.put("permissions", userDetails.getAuthorities());
+        claims.put("permission", userDetails.getAuthorities());
         return Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.ES256, key)
+                .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
     }
 }
