@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class ErrorBaseApiResponse {
-    private final String error;
+public class FieldErrorBaseApiResponse {
     private final int code;
+    private final List<Object> error;
 }

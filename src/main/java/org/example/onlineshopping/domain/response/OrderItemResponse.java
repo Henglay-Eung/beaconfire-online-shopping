@@ -15,4 +15,5 @@ public class OrderItemResponse {
     private int quantity;
     private double purchasePrice;
     private double wholesalePrice;
+    private int productId;
 }
