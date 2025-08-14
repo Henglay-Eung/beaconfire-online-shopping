@@ -76,6 +76,7 @@ public class OrderService {
                         .purchasePrice(orderItem.getPurchasedPrice())
                         .wholesalePrice(orderItem.getWholesalePrice())
                         .quantity(orderItem.getQuantity())
+                        .productId(orderItem.getProduct().getProductId())
                         .build()).collect(Collectors.toList())
                 )
                 .build();
@@ -110,6 +111,7 @@ public class OrderService {
                         .purchasePrice(orderItem.getPurchasedPrice())
                         .wholesalePrice(orderItem.getWholesalePrice())
                         .quantity(orderItem.getQuantity())
+                        .productId(orderItem.getProduct().getProductId())
                         .build()).collect(Collectors.toList())
                 )
                 .build();
@@ -126,6 +128,7 @@ public class OrderService {
                         .purchasePrice(orderItem.getPurchasedPrice())
                         .wholesalePrice(orderItem.getWholesalePrice())
                         .quantity(orderItem.getQuantity())
+                        .productId(orderItem.getProduct().getProductId())
                         .build()).collect(Collectors.toList())
                 )
                 .build()).collect(Collectors.toList());
@@ -149,6 +152,7 @@ public class OrderService {
                         .purchasePrice(orderItem.getPurchasedPrice())
                         .wholesalePrice(orderItem.getWholesalePrice())
                         .quantity(orderItem.getQuantity())
+                        .productId(orderItem.getProduct().getProductId())
                         .build()).collect(Collectors.toList())
                 )
                 .build();
@@ -179,6 +183,7 @@ public class OrderService {
                         .purchasePrice(orderItem.getPurchasedPrice())
                         .wholesalePrice(orderItem.getWholesalePrice())
                         .quantity(orderItem.getQuantity())
+                        .productId(orderItem.getProduct().getProductId())
                         .build()).collect(Collectors.toList())
                 )
                 .build();
@@ -205,6 +210,7 @@ public class OrderService {
                         .purchasePrice(orderItem.getPurchasedPrice())
                         .wholesalePrice(orderItem.getWholesalePrice())
                         .quantity(orderItem.getQuantity())
+                        .productId(orderItem.getProduct().getProductId())
                         .build()).collect(Collectors.toList())
                 )
                 .build();
@@ -243,6 +249,8 @@ public class OrderService {
                         .purchasePrice(orderItem.getPurchasedPrice())
                         .wholesalePrice(orderItem.getWholesalePrice())
                         .quantity(orderItem.getQuantity())
+                        .productId(orderItem.getProduct().getProductId())
+
                         .build()).collect(Collectors.toList())
                 )
                 .build();
