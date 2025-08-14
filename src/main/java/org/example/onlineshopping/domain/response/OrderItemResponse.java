@@ -1,4 +1,4 @@
-package org.example.onlineshopping.domain.login.response;
+package org.example.onlineshopping.domain.response;
 
 
 import lombok.AllArgsConstructor;

@@ -1,8 +1,7 @@
 package org.example.onlineshopping.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.onlineshopping.domain.login.response.ProductResponse;
-import org.example.onlineshopping.domain.login.response.UserResponse;
+import org.example.onlineshopping.domain.response.ProductResponse;
 import org.example.onlineshopping.entity.Product;
 import org.example.onlineshopping.entity.User;
 import org.example.onlineshopping.repository.ProductRepository;

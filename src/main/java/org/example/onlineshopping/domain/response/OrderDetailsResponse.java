@@ -1,9 +1,8 @@
-package org.example.onlineshopping.domain.login.response;
+package org.example.onlineshopping.domain.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
@@ -11,9 +10,9 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @Builder
-public class OrderResponse {
+public class OrderDetailsResponse {
     private final int orderId;
     private final Date datePlaced;
     private final String orderStatus;
-    private final List<OrderItemResponse> orderItemResponses;
+    private final List<OrderItemResponse> orderItems;
 }

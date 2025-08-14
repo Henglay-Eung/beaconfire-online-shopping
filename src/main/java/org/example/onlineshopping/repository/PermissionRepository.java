@@ -7,6 +7,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 
 @Repository
@@ -16,7 +19,12 @@ public class PermissionRepository {
 
     public long countPermission() {
         Session session = sessionFactory.getCurrentSession();
-        Query<Long> query = session.createQuery("SELECT COUNT(p) FROM Permission p");
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<Permission> root = cq.from(Permission.class);
+        cq.select(cb.count(root));
+        Query<Long> query = session.createQuery(cq);
+//        Query<Long> query = session.createQuery("SELECT COUNT(p) FROM Permission p");
         return query.getSingleResult();
     }
 

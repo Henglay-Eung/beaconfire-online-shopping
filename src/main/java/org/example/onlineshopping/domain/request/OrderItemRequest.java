@@ -1,19 +1,17 @@
-package org.example.onlineshopping.domain.login.request;
+package org.example.onlineshopping.domain.request;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderItemRequest {
-    @Min(1)
+    @Min(value = 1, message = "productId must be 1 or greater")
     private int productId;
-    @Min(1)
+    @Min(value = 1, message = "quantity must be 1 or greater")
     private int quantity;
 }

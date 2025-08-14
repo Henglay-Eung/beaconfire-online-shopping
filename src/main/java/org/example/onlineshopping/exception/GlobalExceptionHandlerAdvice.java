@@ -1,7 +1,6 @@
 package org.example.onlineshopping.exception;
 
-import io.jsonwebtoken.JwtException;
-import org.example.onlineshopping.domain.login.response.ErrorBaseApiResponse;
+import org.example.onlineshopping.domain.response.ErrorBaseApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

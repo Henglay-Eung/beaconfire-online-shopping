@@ -1,8 +1,8 @@
 package org.example.onlineshopping.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.onlineshopping.domain.login.request.UserRequest;
-import org.example.onlineshopping.domain.login.response.UserResponse;
+import org.example.onlineshopping.domain.request.UserRequest;
+import org.example.onlineshopping.domain.response.UserResponse;
 import org.example.onlineshopping.entity.Permission;
 import org.example.onlineshopping.entity.User;
 import org.example.onlineshopping.repository.PermissionRepository;

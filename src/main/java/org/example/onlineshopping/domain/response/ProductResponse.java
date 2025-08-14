@@ -1,13 +1,13 @@
-package org.example.onlineshopping.domain.login.response;
+package org.example.onlineshopping.domain.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonView;
+import lombok.*;
+import org.example.onlineshopping.security.Views;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class ProductResponse {
     private int productId;

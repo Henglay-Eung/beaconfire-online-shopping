@@ -8,6 +8,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.Column;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,9 +79,13 @@ public class OrderRepository {
         return query.getResultList();
     }
 
-    public List<Order> getAllOrders() {
+    public List<Order> getAllOrders(int page, int pageSize, String sortedBy, String direction) {
+        int offset = (page - 1) * pageSize;
+        String hql = String.format("from Order o order by o.%s %s", sortedBy, direction);
         Session session = sessionFactory.getCurrentSession();
-        Query<Order> query = session.createQuery("from Order");
+        Query<Order> query = session.createQuery(hql);
+        query.setFirstResult(offset);
+        query.setMaxResults(pageSize);
         return query.getResultList();
     }
 
@@ -146,6 +152,14 @@ public class OrderRepository {
                 "select sum(oi.quantity) from OrderItem oi WHERE oi.order.id IN :orderIdList "
         );
         query.setParameter("orderIdList", orderIdList);
+        return query.getSingleResult();
+    }
+
+    public Long getTotalOrderCount() {
+        Session session = sessionFactory.getCurrentSession();
+        Query<Long> query = session.createQuery(
+                "select count(*) from Order"
+        );
         return query.getSingleResult();
     }
 }

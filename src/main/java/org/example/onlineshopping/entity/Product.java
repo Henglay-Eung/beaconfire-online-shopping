@@ -1,7 +1,9 @@
 package org.example.onlineshopping.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.*;
+import org.example.onlineshopping.security.Views;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -30,9 +32,10 @@ public class Product {
     private double retailPrice;
 
     @Column(name = "wholesale_price")
+
     private double wholeSalePrice;
 
-    @ManyToMany(mappedBy = "watchlist", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "watchlist", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<User> users = new ArrayList<>();
 }

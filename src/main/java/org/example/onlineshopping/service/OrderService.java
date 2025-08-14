@@ -1,11 +1,11 @@
 package org.example.onlineshopping.service;
 
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
-import org.example.onlineshopping.domain.login.request.OrderItemRequest;
-import org.example.onlineshopping.domain.login.request.OrderRequest;
-import org.example.onlineshopping.domain.login.response.OrderItemResponse;
-import org.example.onlineshopping.domain.login.response.OrderResponse;
+import org.example.onlineshopping.domain.request.OrderRequest;
+import org.example.onlineshopping.domain.response.OrderItemResponse;
+import org.example.onlineshopping.domain.response.OrderDetailsResponse;
+import org.example.onlineshopping.domain.response.OrderResponse;
+import org.example.onlineshopping.domain.response.Pagination;
 import org.example.onlineshopping.entity.Order;
 import org.example.onlineshopping.entity.OrderItem;
 import org.example.onlineshopping.entity.Product;
@@ -15,7 +15,6 @@ import org.example.onlineshopping.exception.NotFoundException;
 import org.example.onlineshopping.repository.OrderRepository;
 import org.example.onlineshopping.repository.ProductRepository;
 import org.example.onlineshopping.repository.UserRepository;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,8 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -35,7 +32,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
-    public OrderResponse placeAnOrder(OrderRequest orderRequest, String username) {
+    public OrderDetailsResponse placeAnOrder(OrderRequest orderRequest, String username) {
         Order order = new Order();
         Optional<User> user = userRepository.loadUserByUsername(username);
         if (!user.isPresent()) {
@@ -69,10 +66,10 @@ public class OrderService {
                         .toInstant()
         ));
         orderRepository.placeAnOrder(order);
-        return OrderResponse.builder().orderStatus(order.getOrderStatus())
+        return OrderDetailsResponse.builder().orderStatus(order.getOrderStatus())
                 .datePlaced(order.getDatePlaced())
                 .orderId(order.getOrderId())
-                .orderItemResponses(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
+                .orderItems(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
                         .builder()
                         .itemId(orderItem.getItemId())
                         .purchasePrice(orderItem.getPurchasedPrice())
@@ -83,7 +80,7 @@ public class OrderService {
                 .build();
     }
 
-    public OrderResponse cancelAnOrder(int id, String username) {
+    public OrderDetailsResponse cancelAnOrder(int id, String username) {
         Optional<User> user = userRepository.loadUserByUsername(username);
         if (!user.isPresent()) {
             throw new NotFoundException("User not found");
@@ -103,10 +100,10 @@ public class OrderService {
             orderItem.getProduct().setQuantity(productQuantity);
         });
         orderRepository.updateAnOrder(order);
-        return OrderResponse.builder().orderId(order.getOrderId())
+        return OrderDetailsResponse.builder().orderId(order.getOrderId())
                 .orderStatus(order.getOrderStatus())
                 .datePlaced(order.getDatePlaced())
-                .orderItemResponses(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
+                .orderItems(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
                         .builder()
                         .itemId(orderItem.getItemId())
                         .purchasePrice(orderItem.getPurchasedPrice())
@@ -117,12 +114,12 @@ public class OrderService {
                 .build();
     }
 
-    public List<OrderResponse> getAllOrders() {
-        return orderRepository.getAllOrders().stream().map(order -> OrderResponse.builder()
+    public Pagination<List<OrderDetailsResponse>> getAllOrders(int page, int pageSize, String sortedBy, String direction) {
+        List<OrderDetailsResponse> orderDetailsResponseList = orderRepository.getAllOrders(page, pageSize, sortedBy, direction).stream().map(order -> OrderDetailsResponse.builder()
                 .orderStatus(order.getOrderStatus())
                 .orderId(order.getOrderId())
                 .datePlaced(order.getDatePlaced())
-                .orderItemResponses(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
+                .orderItems(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
                         .builder()
                         .itemId(orderItem.getItemId())
                         .purchasePrice(orderItem.getPurchasedPrice())
@@ -131,18 +128,21 @@ public class OrderService {
                         .build()).collect(Collectors.toList())
                 )
                 .build()).collect(Collectors.toList());
+        Long totalItems = orderRepository.getTotalOrderCount();
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+        return new Pagination<>("Orders fetched successfully", orderDetailsResponseList, page, totalItems, totalPages, pageSize);
     }
 
-    public OrderResponse getOrderByIdForAdmin(int id) {
+    public OrderDetailsResponse getOrderByIdForAdmin(int id) {
         Optional<Order> orderOptional = orderRepository.getAnOrderById(id);
         if (!orderOptional.isPresent()) {
             throw new NotFoundException("Order not found");
         }
         Order order = orderOptional.get();
-        return OrderResponse.builder().orderStatus(order.getOrderStatus())
+        return OrderDetailsResponse.builder().orderStatus(order.getOrderStatus())
                 .orderId(order.getOrderId())
                 .datePlaced(order.getDatePlaced())
-                .orderItemResponses(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
+                .orderItems(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
                         .builder()
                         .itemId(orderItem.getItemId())
                         .purchasePrice(orderItem.getPurchasedPrice())
@@ -153,7 +153,7 @@ public class OrderService {
                 .build();
     }
 
-    public OrderResponse cancelAnOrderForAdmin(int id) {
+    public OrderDetailsResponse cancelAnOrderForAdmin(int id) {
         Optional<Order> orderOptional = orderRepository.getAnOrderById(id);
         if (!orderOptional.isPresent()) {
             throw new NotFoundException(String.format("Order id = %d not found", id));
@@ -169,10 +169,10 @@ public class OrderService {
             orderItem.getProduct().setQuantity(productQuantity);
         });
         orderRepository.updateAnOrder(order);
-        return OrderResponse.builder().orderStatus(order.getOrderStatus())
+        return OrderDetailsResponse.builder().orderStatus(order.getOrderStatus())
                 .orderId(order.getOrderId())
                 .datePlaced(order.getDatePlaced())
-                .orderItemResponses(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
+                .orderItems(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
                         .builder()
                         .itemId(orderItem.getItemId())
                         .purchasePrice(orderItem.getPurchasedPrice())
@@ -184,7 +184,7 @@ public class OrderService {
 
     }
 
-    public OrderResponse completeAnOrderForAdmin(int id) {
+    public OrderDetailsResponse completeAnOrderForAdmin(int id) {
         Optional<Order> orderOptional = orderRepository.getAnOrderById(id);
         if (!orderOptional.isPresent()) {
             throw new NotFoundException(String.format("Order id = %d not found", id));
@@ -195,10 +195,10 @@ public class OrderService {
         }
         order.setOrderStatus("Completed");
         orderRepository.updateAnOrder(order);
-        return OrderResponse.builder().orderStatus(order.getOrderStatus())
+        return OrderDetailsResponse.builder().orderStatus(order.getOrderStatus())
                 .orderId(order.getOrderId())
                 .datePlaced(order.getDatePlaced())
-                .orderItemResponses(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
+                .orderItems(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
                         .builder()
                         .itemId(orderItem.getItemId())
                         .purchasePrice(orderItem.getPurchasedPrice())
@@ -218,24 +218,33 @@ public class OrderService {
                         .orderId(order.getOrderId())
                         .orderStatus(order.getOrderStatus())
                         .datePlaced(order.getDatePlaced())
-                        .orderItemResponses(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
-                                .builder()
-                                .itemId(orderItem.getItemId())
-                                .purchasePrice(orderItem.getPurchasedPrice())
-                                .wholesalePrice(orderItem.getWholesalePrice())
-                                .quantity(orderItem.getQuantity())
-                                .build()).collect(Collectors.toList())
-                        )
                         .build())
                 .collect(Collectors.toList());
     }
-    public OrderResponse getOrderByIdForUser(int id, String username) {
-        Optional<OrderResponse> order  = getAllOrdersForUser(username).stream().filter(o -> o.getOrderId() == id)
-                .findFirst();
-        if (!order.isPresent()) {
-            throw new NotFoundException("Order not found");
+    public OrderDetailsResponse getOrderByIdForUser(int id, String username) {
+        Optional<User> user = userRepository.loadUserByUsername(username);
+        if (!user.isPresent()) {
+            throw new NotFoundException("User not found");
         }
-        return order.get();
+        Optional<Order> orderOptional = orderRepository.getAnOrderByIdAndUserId(id, user.get().getUserId());
+        if (!orderOptional.isPresent()) {
+            throw new RuntimeException(String.format("Order id = %d not found", id));
+        }
+
+        Order order = orderOptional.get();
+
+        return OrderDetailsResponse.builder().orderStatus(order.getOrderStatus())
+                .orderId(order.getOrderId())
+                .datePlaced(order.getDatePlaced())
+                .orderItems(order.getOrderItemList().stream().map(orderItem -> OrderItemResponse
+                        .builder()
+                        .itemId(orderItem.getItemId())
+                        .purchasePrice(orderItem.getPurchasedPrice())
+                        .wholesalePrice(orderItem.getWholesalePrice())
+                        .quantity(orderItem.getQuantity())
+                        .build()).collect(Collectors.toList())
+                )
+                .build();
 
     }
 }

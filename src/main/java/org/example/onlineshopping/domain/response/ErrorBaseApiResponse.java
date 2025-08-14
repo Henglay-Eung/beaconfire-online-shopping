@@ -1,8 +1,7 @@
-package org.example.onlineshopping.domain.login.response;
+package org.example.onlineshopping.domain.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor

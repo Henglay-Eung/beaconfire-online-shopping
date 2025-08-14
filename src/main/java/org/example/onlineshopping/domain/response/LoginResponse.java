@@ -1,6 +1,5 @@
-package org.example.onlineshopping.domain.login.response;
+package org.example.onlineshopping.domain.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

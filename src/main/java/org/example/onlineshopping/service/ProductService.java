@@ -1,11 +1,10 @@
 package org.example.onlineshopping.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.onlineshopping.domain.login.request.ProductRequest;
-import org.example.onlineshopping.domain.login.response.OrderItemResponse;
-import org.example.onlineshopping.domain.login.response.ProductResponse;
-import org.example.onlineshopping.entity.Order;
-import org.example.onlineshopping.entity.OrderItem;
+import org.example.onlineshopping.domain.request.ProductRequest;
+import org.example.onlineshopping.domain.response.AdminProductResponse;
+import org.example.onlineshopping.domain.response.OrderItemResponse;
+import org.example.onlineshopping.domain.response.ProductResponse;
 import org.example.onlineshopping.entity.Product;
 import org.example.onlineshopping.entity.User;
 import org.example.onlineshopping.exception.NotFoundException;
@@ -15,7 +14,6 @@ import org.example.onlineshopping.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,10 +26,26 @@ public class ProductService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
 
+    public List<AdminProductResponse> getAllProductsForAdmin() {
+        List<Product> products = productRepository.getAllProducts();
+        return products.stream().map(product -> new AdminProductResponse(product.getProductId(), product.getName(), product.getDescription(), product.getRetailPrice(), product.getWholeSalePrice(), product.getQuantity())).collect(Collectors.toList());
+    }
+
     public List<ProductResponse> getAllProducts() {
         List<Product> products = productRepository.getAllProducts();
-        return products.stream().map(product -> new ProductResponse(product.getProductId(), product.getDescription(), product.getName(), product.getRetailPrice(), product.getWholeSalePrice())).collect(Collectors.toList());
+        return products.stream().map(product -> new ProductResponse(product.getProductId(), product.getName(), product.getDescription(), product.getRetailPrice(), product.getWholeSalePrice())).collect(Collectors.toList());
     }
+
+    public AdminProductResponse getProductByIdForAdmin(int id) {
+        Optional<Product> productOptional = productRepository.getProductById(id);
+        if (!productOptional.isPresent()) {
+            throw new NotFoundException("Product not found");
+        }
+        Product product = productOptional.get();
+        return new AdminProductResponse(product.getProductId(), product.getDescription(), product.getName(),
+                product.getRetailPrice(), product.getWholeSalePrice(), product.getQuantity());
+    }
+
 
     public ProductResponse getProductById(int id) {
         Optional<Product> productOptional = productRepository.getProductById(id);
@@ -78,7 +92,7 @@ public class ProductService {
                 .build()).collect(Collectors.toList());
     }
 
-    public ProductResponse updateProductByIdForAdmin(int id, ProductRequest productRequest) {
+    public AdminProductResponse updateProductByIdForAdmin(int id, ProductRequest productRequest) {
         Optional<Product> productOptional = productRepository.getProductById(id);
         if (!productOptional.isPresent()) {
             throw new NotFoundException("Product not found");
@@ -101,16 +115,11 @@ public class ProductService {
         }
 
         productRepository.updateProductForAdmin(product);
-        return ProductResponse.builder()
-                .productId(product.getProductId())
-                .name(product.getName())
-                .wholesalePrice(product.getWholeSalePrice())
-                .retailPrice(product.getRetailPrice())
-                .description(product.getDescription())
-                .build();
+        return new AdminProductResponse(product.getProductId(), product.getDescription(), product.getName(),
+                product.getRetailPrice(), product.getWholeSalePrice(), product.getQuantity());
     }
 
-    public ProductResponse addProductForAdmin(ProductRequest productRequest) {
+    public AdminProductResponse addProductForAdmin(ProductRequest productRequest) {
         Product product = Product.builder()
                 .name(productRequest.getName())
                 .description(productRequest.getDescription())
@@ -120,13 +129,8 @@ public class ProductService {
                 .build();
 
         productRepository.addProductForAdmin(product);
-        return ProductResponse.builder()
-                .productId(product.getProductId())
-                .name(product.getName())
-                .wholesalePrice(product.getWholeSalePrice())
-                .retailPrice(product.getRetailPrice())
-                .description(product.getDescription())
-                .build();
+        return new AdminProductResponse(product.getProductId(), product.getDescription(), product.getName(),
+                product.getRetailPrice(), product.getWholeSalePrice(), product.getQuantity());
     }
 
     public List<OrderItemResponse> getMostProfitableProducts(int topN) {

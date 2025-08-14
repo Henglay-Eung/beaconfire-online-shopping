@@ -1,11 +1,8 @@
 package org.example.onlineshopping.controller.user_controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.onlineshopping.domain.login.response.BaseApiResponse;
-import org.example.onlineshopping.domain.login.response.ProductResponse;
-import org.example.onlineshopping.entity.Product;
-import org.example.onlineshopping.entity.User;
-import org.example.onlineshopping.service.UserService;
+import org.example.onlineshopping.domain.response.BaseApiResponse;
+import org.example.onlineshopping.domain.response.ProductResponse;
 import org.example.onlineshopping.service.WatchListService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/watchlist")
