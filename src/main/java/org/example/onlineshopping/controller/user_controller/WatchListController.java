@@ -1,6 +1,8 @@
 package org.example.onlineshopping.controller.user_controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.onlineshopping.domain.login.response.BaseApiResponse;
+import org.example.onlineshopping.domain.login.response.ProductResponse;
 import org.example.onlineshopping.entity.Product;
 import org.example.onlineshopping.entity.User;
 import org.example.onlineshopping.service.UserService;
@@ -18,28 +20,26 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class WatchListController {
     private final WatchListService watchListService;
-    private final UserService userService;
 
     @PostMapping("/product/{id}")
-    public void AddProductToWatchlist(@PathVariable int id, Principal principal) {
-        //String username = principal.getName();
-        String username = "user";
-        watchListService.addNewProductToWatchList(username, id);
+    public ResponseEntity<BaseApiResponse<ProductResponse>> AddProductToWatchlist(@PathVariable int id, Principal principal) {
+        String username = principal.getName();
+        ProductResponse productResponse = watchListService.addNewProductToWatchList(username, id);
+        return new ResponseEntity<>(new BaseApiResponse<>("Product added to watchlist successfully", productResponse), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/product/{id}")
-    public void removeProductFromWatchlist(@PathVariable int id, Principal principal) {
-        //String username = principal.getName();
-        String username = "user";
-        watchListService.removeProductFromWatchList(username, id);
+    public ResponseEntity<BaseApiResponse<ProductResponse>> removeProductFromWatchlist(@PathVariable int id, Principal principal) {
+        String username = principal.getName();
+        ProductResponse productResponse = watchListService.removeProductFromWatchList(username, id);
+        return new ResponseEntity<>(new BaseApiResponse<>("Product removed from watchlist successfully", productResponse), HttpStatus.CREATED);
     }
 
     @GetMapping("/products/all")
-    public ResponseEntity<List<Product>> GetAllProductsFromWatchlist(Principal principal) {
-//        String username = principal.getName();
-        String username = "user";
-        List<Product> products = watchListService.getAllProductsFromWatchList(username);
-        return new ResponseEntity<>(products, HttpStatus.OK);
+    public ResponseEntity<BaseApiResponse<List<ProductResponse>>> GetAllProductsFromWatchlist(Principal principal) {
+        String username = principal.getName();
+        List<ProductResponse> products = watchListService.getAllProductsFromWatchList(username);
+        return new ResponseEntity<>(new BaseApiResponse<>("Watchlist products fetched successfully", products), HttpStatus.OK);
     }
 
 }

@@ -1,6 +1,8 @@
 package org.example.onlineshopping.controller.admin_controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.onlineshopping.domain.login.response.BaseApiResponse;
+import org.example.onlineshopping.domain.login.response.OrderResponse;
 import org.example.onlineshopping.entity.Order;
 import org.example.onlineshopping.service.OrderService;
 import org.springframework.http.HttpStatus;
@@ -18,25 +20,25 @@ public class AdminOrderController {
     private final OrderService orderService;
     // For admin
     @GetMapping("/all")
-    public ResponseEntity<List<Order>> getAllOrders() {
-        List<Order> orders = orderService.getAllOrders();
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+    public ResponseEntity<BaseApiResponse<List<OrderResponse>>> getAllOrders() {
+        List<OrderResponse> orders = orderService.getAllOrders();
+        return new ResponseEntity<>(new BaseApiResponse<>("Orders fetched successfully", orders), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable int id) {
-        Order order = orderService.getOrderByIdForAdmin(id);
-        return new ResponseEntity<>(order, HttpStatus.OK);
+    public ResponseEntity<BaseApiResponse<OrderResponse>> getOrderById(@PathVariable int id) {
+        OrderResponse order = orderService.getOrderByIdForAdmin(id);
+        return new ResponseEntity<>(new BaseApiResponse<>("Order fetched successfully", order), HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<String> cancelAnOrderForAdmin(@PathVariable int id) {;
-        orderService.cancelAnOrderForAdmin(id);
-        return new ResponseEntity<>("Order canceled successfully", HttpStatus.ACCEPTED);
+    public ResponseEntity<BaseApiResponse<OrderResponse>> cancelAnOrderForAdmin(@PathVariable int id) {;
+        OrderResponse orderResponse = orderService.cancelAnOrderForAdmin(id);
+        return new ResponseEntity<>(new BaseApiResponse<>("Order canceled successfully", orderResponse), HttpStatus.ACCEPTED);
     }
     @PatchMapping("/{id}/complete")
-    public ResponseEntity<String> completeAnOrderForAdmin(@PathVariable int id) {
-        orderService.completeAnOrderForAdmin(id);
-        return new ResponseEntity<>("Order completed successfully", HttpStatus.ACCEPTED);
+    public ResponseEntity<BaseApiResponse<OrderResponse>> completeAnOrderForAdmin(@PathVariable int id) {
+        OrderResponse orderResponse =orderService.completeAnOrderForAdmin(id);
+        return new ResponseEntity<>(new BaseApiResponse<>("Order completed successfully", orderResponse), HttpStatus.ACCEPTED);
     }
 }

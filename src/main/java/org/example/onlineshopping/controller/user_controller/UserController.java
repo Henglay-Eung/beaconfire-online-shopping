@@ -2,6 +2,8 @@ package org.example.onlineshopping.controller.user_controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.onlineshopping.domain.login.request.UserRequest;
+import org.example.onlineshopping.domain.login.response.BaseApiResponse;
+import org.example.onlineshopping.domain.login.response.UserResponse;
 import org.example.onlineshopping.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +21,8 @@ import javax.validation.Valid;
 public class UserController {
     private final UserService userService;
     @PostMapping("/signup")
-    public ResponseEntity<String> register(@Valid @RequestBody UserRequest userRequest) {
-        userService.registerUser(userRequest);
-        return new ResponseEntity<>("User has been successfully created.", HttpStatus.CREATED);
+    public ResponseEntity<BaseApiResponse<UserResponse>> register(@Valid @RequestBody UserRequest userRequest) {
+        UserResponse userResponse = userService.registerUser(userRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new BaseApiResponse<>("User account has been successfully created.", userResponse));
     }
 }

@@ -1,6 +1,8 @@
 package org.example.onlineshopping.controller.user_controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.onlineshopping.domain.login.response.BaseApiResponse;
+import org.example.onlineshopping.domain.login.response.OrderItemResponse;
 import org.example.onlineshopping.domain.login.response.ProductResponse;
 import org.example.onlineshopping.entity.OrderItem;
 import org.example.onlineshopping.service.ProductService;
@@ -18,28 +20,28 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts() {
+    public ResponseEntity<BaseApiResponse<List<ProductResponse>>> getAllProducts() {
         List<ProductResponse> products = productService.getAllProducts();
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        return new ResponseEntity<>(new BaseApiResponse<>("Products fetched successfully", products), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable int id) throws Exception {
+    public ResponseEntity<BaseApiResponse<ProductResponse>> getProductById(@PathVariable int id) {
         ProductResponse product = productService.getProductById(id);
-        return new ResponseEntity<>(product, HttpStatus.OK);
+        return new ResponseEntity<>(new BaseApiResponse<>("Product fetched successfully", product), HttpStatus.OK);
     }
 
     @GetMapping("/recent/{top-n}")
-    public ResponseEntity<List<OrderItem>> getMostRecentlyPurchasedProducts(@PathVariable(name = "top-n") int topN, Principal principal) {
-        String username = "user";
-        List<OrderItem> orderItems = productService.getMostRecentlyPurchasedProducts(topN, username);
-        return new ResponseEntity<>(orderItems, HttpStatus.OK);
+    public ResponseEntity<BaseApiResponse<List<OrderItemResponse>>> getMostRecentlyPurchasedProducts(@PathVariable(name = "top-n") int topN, Principal principal) {
+        String username = principal.getName();
+        List<OrderItemResponse> orderItems = productService.getMostRecentlyPurchasedProducts(topN, username);
+        return new ResponseEntity<>(new BaseApiResponse<>("Most recently purchased products fetched", orderItems), HttpStatus.OK);
     }
 
     @GetMapping("/frequent/{top-n}")
-    public ResponseEntity<List<OrderItem>> getMostFrequentlyPurchasedProducts(@PathVariable(name = "top-n") int topN, Principal principal) {
-        String username = "user";
-        List<OrderItem> orderItems = productService.getMostFrequentlyPurchasedProducts(topN, username);
-        return new ResponseEntity<>(orderItems, HttpStatus.OK);
+    public ResponseEntity<BaseApiResponse<List<OrderItemResponse>>> getMostFrequentlyPurchasedProducts(@PathVariable(name = "top-n") int topN, Principal principal) {
+        String username = principal.getName();
+        List<OrderItemResponse> orderItems = productService.getMostFrequentlyPurchasedProducts(topN, username);
+        return new ResponseEntity<>(new BaseApiResponse<>("Most frequently purchased products fetched", orderItems), HttpStatus.OK);
     }
 }

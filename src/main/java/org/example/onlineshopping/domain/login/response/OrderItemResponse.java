@@ -1,5 +1,6 @@
 package org.example.onlineshopping.domain.login.response;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,10 +10,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class ProductResponse {
-    private int productId;
-    private String name;
-    private String description;
-    private double retailPrice;
+public class OrderItemResponse {
+    private int itemId;
+    private int quantity;
+    private double purchasePrice;
     private double wholesalePrice;
 }

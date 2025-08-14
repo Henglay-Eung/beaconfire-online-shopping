@@ -3,6 +3,7 @@ package org.example.onlineshopping.controller.user_controller;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Or;
 import org.example.onlineshopping.domain.login.request.OrderRequest;
+import org.example.onlineshopping.domain.login.response.BaseApiResponse;
 import org.example.onlineshopping.domain.login.response.OrderResponse;
 import org.example.onlineshopping.domain.login.response.ProductResponse;
 import org.example.onlineshopping.entity.Order;
@@ -23,26 +24,30 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders(Principal principal) {
-        List<Order> orders = orderService.getAllOrdersForUser("user");
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+    public ResponseEntity<BaseApiResponse<List<OrderResponse>>> getAllOrders(Principal principal) {
+        String username = principal.getName();
+        List<OrderResponse> orders = orderService.getAllOrdersForUser(username);
+        return new ResponseEntity<>(new BaseApiResponse<>("Orders fetch successfully", orders), HttpStatus.OK);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable int id, Principal principal) {
-        Order order = orderService.getOrderByIdForUser(id, "user");
-        return new ResponseEntity<>(order, HttpStatus.OK);
+    public ResponseEntity<BaseApiResponse<OrderResponse>> getOrderById(@PathVariable int id, Principal principal) {
+        String username = principal.getName();
+        OrderResponse order = orderService.getOrderByIdForUser(id, username);
+        return new ResponseEntity<>(new BaseApiResponse<>("Order fetch successfully", order), HttpStatus.OK);
     }
     @PostMapping
-    public ResponseEntity<String> placeAnOrder(@Valid @RequestBody OrderRequest orderRequest, Principal principal) {
-        orderService.placeAnOrder(orderRequest, "user");
-        return new ResponseEntity<>("Order placed successfully", HttpStatus.CREATED);
+    public ResponseEntity<BaseApiResponse<OrderResponse>> placeAnOrder(@Valid @RequestBody OrderRequest orderRequest, Principal principal) {
+        String username = principal.getName();
+        OrderResponse order = orderService.placeAnOrder(orderRequest, username);
+        return new ResponseEntity<>(new BaseApiResponse<>("Order placed successfully", order), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<String> cancelAnOrder(@PathVariable int id, Principal principal) {
-        orderService.cancelAnOrder(id, "user");
-        return new ResponseEntity<>("Order canceled successfully", HttpStatus.OK);
+    public ResponseEntity<BaseApiResponse<OrderResponse>> cancelAnOrder(@PathVariable int id, Principal principal) {
+        String username = principal.getName();
+        OrderResponse order = orderService.cancelAnOrder(id, username);
+        return new ResponseEntity<>(new BaseApiResponse<>("Order canceled successfully", order), HttpStatus.OK);
     }
 
 }

@@ -1,6 +1,8 @@
 package org.example.onlineshopping.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.onlineshopping.domain.login.response.ProductResponse;
+import org.example.onlineshopping.domain.login.response.UserResponse;
 import org.example.onlineshopping.entity.Product;
 import org.example.onlineshopping.entity.User;
 import org.example.onlineshopping.repository.ProductRepository;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +21,7 @@ public class WatchListService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-    public void addNewProductToWatchList(String username, int productId) {
+    public ProductResponse addNewProductToWatchList(String username, int productId) {
         Optional<User> userOptional = userRepository.loadUserByUsername(username);
         if (!userOptional.isPresent()) {
             throw new RuntimeException("User not found");
@@ -32,9 +35,14 @@ public class WatchListService {
         Product product = productOptional.get();
         user.addProductToWatchList(product);
         userRepository.updateUser(user);
+        return ProductResponse.builder().productId(product.getProductId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .retailPrice(product.getRetailPrice())
+                .wholesalePrice(product.getWholeSalePrice()).build();
     }
 
-    public void removeProductFromWatchList(String username, int productId) {
+    public ProductResponse removeProductFromWatchList(String username, int productId) {
         Optional<User> userOptional = userRepository.loadUserByUsername(username);
         if (!userOptional.isPresent()) {
             throw new RuntimeException("User not found");
@@ -48,14 +56,26 @@ public class WatchListService {
         Product product = productOptional.get();
         user.removeProductFromWatchList(product);
         userRepository.updateUser(user);
+        return ProductResponse.builder().productId(product.getProductId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .retailPrice(product.getRetailPrice())
+                .wholesalePrice(product.getWholeSalePrice()).build();
     }
 
-    public List<Product> getAllProductsFromWatchList(String username) {
+    public List<ProductResponse> getAllProductsFromWatchList(String username) {
         Optional<User> userOptional = userRepository.loadUserByUsernameWithWatchList(username);
         if (!userOptional.isPresent()) {
             throw new RuntimeException("User not found");
         }
 
-        return userOptional.get().getWatchlist();
+        return userOptional.get().getWatchlist().stream().map(product -> ProductResponse.builder()
+                    .name(product.getName())
+                    .description(product.getDescription())
+                    .wholesalePrice(product.getWholeSalePrice())
+                    .retailPrice(product.getRetailPrice())
+                    .productId(product.getProductId())
+                    .build())
+                .collect(Collectors.toList());
     }
 }

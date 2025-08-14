@@ -1,6 +1,8 @@
 package org.example.onlineshopping.entity;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -23,10 +25,11 @@ public class User {
 
     private String email;
 
+    @JsonIgnore
     private String password;
 
     @Column
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany
     @JoinColumn(name = "fk_auth_id")
     private List<Permission> permissions;
 

@@ -28,13 +28,12 @@ public class LoginController {
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        } catch (InvalidCredentialsException e) {
-            throw new BadCredentialsException("Incorrect credentials, please try again.");
+        } catch (Exception e) {
+            throw new InvalidCredentialsException("Incorrect credentials, please try again.");
         }
 
         AuthUserDetail authUserDetail = (AuthUserDetail) authentication.getPrincipal();
         String token = jwtProvider.createToken(authUserDetail);
-        System.out.println(token);
         return new ResponseEntity<>(LoginResponse.builder()
                 .message("Logged in successfully.")
                 .token(token)

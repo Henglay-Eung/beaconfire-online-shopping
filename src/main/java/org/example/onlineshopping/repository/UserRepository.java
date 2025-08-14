@@ -25,11 +25,11 @@ public class UserRepository {
         return Optional.ofNullable(user);
     }
 
-    public void registerUser(String username, String email, String password, List<Permission> permissionList) {
+    public User registerUser(String username, String email, String password, List<Permission> permissionList) {
         Session session = sessionFactory.getCurrentSession();
-
         User user = User.builder().username(username).email(email).password(password).permissions(permissionList).build();
-        session.persist(user);
+        session.save(user);
+        return user;
     }
 
     public void updateUser(User user) {

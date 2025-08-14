@@ -9,10 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class ProductResponse {
-    private int productId;
-    private String name;
-    private String description;
-    private double retailPrice;
-    private double wholesalePrice;
+public class UserResponse {
+    private Long userId;
+    private String username;
+    private String email;
 }

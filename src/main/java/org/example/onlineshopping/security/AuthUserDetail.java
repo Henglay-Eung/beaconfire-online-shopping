@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 @AllArgsConstructor
+@Builder
 public class AuthUserDetail implements UserDetails {
     private String username;
     private String password;

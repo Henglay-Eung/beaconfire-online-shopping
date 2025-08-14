@@ -2,8 +2,10 @@ package org.example.onlineshopping.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.onlineshopping.domain.login.request.UserRequest;
+import org.example.onlineshopping.domain.login.response.UserResponse;
 import org.example.onlineshopping.entity.Permission;
 import org.example.onlineshopping.entity.User;
+import org.example.onlineshopping.repository.PermissionRepository;
 import org.example.onlineshopping.repository.UserRepository;
 import org.example.onlineshopping.security.AuthUserDetail;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,9 +23,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PermissionRepository permissionRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -38,17 +42,22 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void registerUser(UserRequest userRequest) {
+    public UserResponse registerUser(UserRequest userRequest) {
         if (!userRepository.isUsernameOrEmailAvailable(userRequest.getUsername(), userRequest.getEmail())) {
             throw new RuntimeException("Username or password is taken");
         }
+        Permission permission = permissionRepository.getPermission("user");
         List<Permission> permissionList = new ArrayList<>();
         // Default permission
-        permissionList.add(Permission.builder().value("user").build());
-        userRepository.registerUser(
+        permissionList.add(permission);
+        User user = userRepository.registerUser(
                 userRequest.getUsername(),
                 userRequest.getEmail(),
                 passwordEncoder.encode(userRequest.getPassword()),
                 permissionList);
+        return UserResponse.builder().userId(user.getUserId())
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .build();
     }
 }
