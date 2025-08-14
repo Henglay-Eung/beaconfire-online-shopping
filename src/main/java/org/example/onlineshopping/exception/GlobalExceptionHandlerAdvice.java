@@ -8,11 +8,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandlerAdvice {
-    @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ErrorBaseApiResponse> handleInvalidCredentialsException(InvalidCredentialsException e) {
-        return new ResponseEntity<>(new ErrorBaseApiResponse(e.getMessage(), HttpStatus.FORBIDDEN.value()), HttpStatus.FORBIDDEN);
-    }
-
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorBaseApiResponse> handleNotFoundExceptions(NotFoundException e) {
         return new ResponseEntity<>(new ErrorBaseApiResponse(e.getMessage(), HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND);

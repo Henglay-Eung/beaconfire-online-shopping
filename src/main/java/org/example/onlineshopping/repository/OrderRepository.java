@@ -3,6 +3,7 @@ package org.example.onlineshopping.repository;
 import lombok.RequiredArgsConstructor;
 import org.example.onlineshopping.entity.Order;
 import org.example.onlineshopping.entity.OrderItem;
+import org.example.onlineshopping.entity.Product;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -36,17 +37,17 @@ public class OrderRepository {
         return Optional.ofNullable(query.getSingleResult());
     }
 
-    public List<Integer> getTopNMostRecentOrderListByUserId(Long userId) {
+    public List<Order> getMostRecentOrderListByUserId(Long userId) {
         Session session = sessionFactory.getCurrentSession();
-        Query<Integer> query = session.createQuery("select o.orderId from Order o WHERE o.user.id = :userId AND o.orderStatus = :status ORDER BY o.datePlaced DESC");
+        Query<Order> query = session.createQuery("from Order o WHERE o.user.id = :userId AND o.orderStatus != :status order by o.datePlaced DESC");
         query.setParameter("userId", userId);
-        query.setParameter("status", "Completed");
+        query.setParameter("status", "Canceled");
         return query.list();
     }
 
     public List<OrderItem> getOrderItemsByOrderId(List<Integer> orderIdList, int topN) {
         Session session = sessionFactory.getCurrentSession();
-        Query<OrderItem> query = session.createQuery("from OrderItem oi WHERE oi.order.orderId in :orderIdList");
+        Query<OrderItem> query = session.createQuery("from OrderItem oi WHERE oi.order.orderId in :orderIdList ORDER BY oi.order.orderId DESC");
         query.setParameter("orderIdList", orderIdList);
         query.setMaxResults(topN);
         return query.getResultList();
@@ -54,19 +55,20 @@ public class OrderRepository {
 
     public List<Integer> getOrderListByUserId(Long userId) {
         Session session = sessionFactory.getCurrentSession();
-        Query<Integer> query = session.createQuery("select o.id from Order o WHERE o.user.id = :userId AND o.orderStatus = :status");
+        Query<Integer> query = session.createQuery("select o.id from Order o WHERE o.user.id = :userId AND o.orderStatus != :status order by o.orderId DESC");
         query.setParameter("userId", userId);
-        query.setParameter("status", "Completed");
+        query.setParameter("status", "Canceled");
         return query.list();
     }
 
-    public List<Integer> getTopNFrequentOrderItemIdList(List<Integer> orderIdList, int topN) {
+    public List<Product> getTopNFrequentOrderItemIdList(List<Integer> orderIdList, int topN) {
         Session session = sessionFactory.getCurrentSession();
-        Query<Integer> query = session.createQuery("" +
-                "select oi.itemId from OrderItem oi WHERE oi.order.id IN :orderIdList " +
-                "group by oi.itemId order by COUNT(oi.order.id) DESC"
+        Query<Product> query = session.createQuery("" +
+                "select oi.product from OrderItem oi WHERE oi.order.id IN :orderIdList " +
+                "group by oi.product order by COUNT(oi.product.productId) DESC"
         );
         query.setParameter("orderIdList", orderIdList);
+        query.setMaxResults(topN);
         return query.list();
     }
 
@@ -124,11 +126,11 @@ public class OrderRepository {
         return query.getResultList();
     }
 
-    public List<Integer> getTopNProfitableOrderItemIdList(List<Integer> orderIdList, int topN) {
+    public List<Product> getTopNProfitableOrderItemIdList(List<Integer> orderIdList, int topN) {
         Session session = sessionFactory.getCurrentSession();
-        Query<Integer> query = session.createQuery("" +
-                "select oi.product.id from OrderItem oi WHERE oi.order.id IN :orderIdList " +
-                "group by oi.product.id order by sum(oi.purchasedPrice - oi.wholesalePrice) DESC"
+        Query<Product> query = session.createQuery("" +
+                "select oi.product from OrderItem oi WHERE oi.order.id IN :orderIdList " +
+                "group by oi.product order by SUM(oi.purchasedPrice - oi.wholesalePrice) DESC"
         );
         query.setParameter("orderIdList", orderIdList);
         query.setMaxResults(topN);
@@ -161,5 +163,15 @@ public class OrderRepository {
                 "select count(*) from Order"
         );
         return query.getSingleResult();
+    }
+
+    public List<Object[]> getTopNPopularOrderItemIdList(List<Integer> orderIdList) {
+        Session session = sessionFactory.getCurrentSession();
+        Query<Object[]> query = session.createQuery(
+                "select oi.product, SUM(oi.quantity) from OrderItem oi WHERE oi.order.id IN :orderIdList " +
+                        "group by oi.product order by SUM(oi.quantity) DESC"
+        );
+        query.setParameter("orderIdList", orderIdList);
+        return query.list();
     }
 }

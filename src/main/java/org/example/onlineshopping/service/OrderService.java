@@ -36,7 +36,7 @@ public class OrderService {
         Order order = new Order();
         Optional<User> user = userRepository.loadUserByUsername(username);
         if (!user.isPresent()) {
-            throw new RuntimeException(String.format("User not found"));
+            throw new NotFoundException(String.format("User not found"));
         }
         order.setUser(user.get());
         order.setOrderStatus("Processing");
@@ -44,12 +44,13 @@ public class OrderService {
         List<OrderItem> orderItems = orderRequest.getOrderItems().stream().map(orderItem -> {
             Optional<Product> productOptional = productRepository.getProductById(orderItem.getProductId());
             if (!productOptional.isPresent()) {
-                throw new RuntimeException(String.format("Product id = %d not found", orderItem.getProductId()));
+                throw new NotFoundException(String.format("Product id = %d not found", orderItem.getProductId()));
             }
             Product product = productOptional.get();
             if (product.getQuantity() < orderItem.getQuantity()) {
                 throw new NotEnoughInventoryException(String.format("Product id = %d not enough quantity", orderItem.getProductId()));
             }
+            product.setQuantity(product.getQuantity() - orderItem.getQuantity());
             return OrderItem.builder()
                     .purchasedPrice(product.getRetailPrice())
                     .wholesalePrice(product.getWholeSalePrice())

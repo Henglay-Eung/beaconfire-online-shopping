@@ -2,9 +2,8 @@ package org.example.onlineshopping.controller.admin_controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.onlineshopping.domain.request.ProductRequest;
-import org.example.onlineshopping.domain.response.AdminProductResponse;
-import org.example.onlineshopping.domain.response.BaseApiResponse;
-import org.example.onlineshopping.domain.response.OrderItemResponse;
+import org.example.onlineshopping.domain.request.ProductUpdateRequest;
+import org.example.onlineshopping.domain.response.*;
 import org.example.onlineshopping.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +31,7 @@ public class AdminProductController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<BaseApiResponse<AdminProductResponse>> updateProductByIdForAdmin(@PathVariable int id, @Valid @RequestBody ProductRequest productRequest) {
+    public ResponseEntity<BaseApiResponse<AdminProductResponse>> updateProductByIdForAdmin(@PathVariable int id, @Valid @RequestBody ProductUpdateRequest productRequest) {
         AdminProductResponse productResponse = productService.updateProductByIdForAdmin(id, productRequest);
         return new ResponseEntity<>(new BaseApiResponse<>("Product updated successfully", productResponse), HttpStatus.OK);
     }
@@ -44,20 +43,20 @@ public class AdminProductController {
     }
 
     @GetMapping("/profit/{top-n}")
-    public ResponseEntity<BaseApiResponse<List<OrderItemResponse>>> getMostProfitableProducts(@PathVariable(name = "top-n") int topN) {
-        List<OrderItemResponse> orderItems = productService.getMostProfitableProducts(topN);
+    public ResponseEntity<BaseApiResponse<List<ProductResponse>>> getMostProfitableProducts(@PathVariable(name = "top-n") int topN) {
+        List<ProductResponse> orderItems = productService.getMostProfitableProducts(topN);
         return new ResponseEntity<>(new BaseApiResponse<>("Most profitable products fetched", orderItems), HttpStatus.OK);
     }
 
     @GetMapping("/popular/{top-n}")
-    public ResponseEntity<BaseApiResponse<List<OrderItemResponse>>> getMostPopularProducts(@PathVariable(name = "top-n") int topN) {
-        List<OrderItemResponse> orderItems = productService.getMostPopularProducts(topN);
+    public ResponseEntity<BaseApiResponse<List<AdminProductResponse>>> getMostPopularProducts(@PathVariable(name = "top-n") int topN) {
+        List<AdminProductResponse> orderItems = productService.getMostPopularProducts(topN);
         return new ResponseEntity<>(new BaseApiResponse<>("Most popular products fetched", orderItems), HttpStatus.OK);
     }
 
     @GetMapping("/sold")
-    public ResponseEntity<BaseApiResponse<Long>> getTotalNumberOfItemsSold() {
-        Long orderItems = productService.getTotalOfItemsSold();
+    public ResponseEntity<BaseApiResponse<List<AdminProductSoldResponse>>> getTotalNumberOfItemsSold() {
+        List<AdminProductSoldResponse> orderItems = productService.getTotalOfItemsSold();
         return new ResponseEntity<>(new BaseApiResponse<>("Total number of products sold fetched products", orderItems), HttpStatus.OK);
     }
 }
